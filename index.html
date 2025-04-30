@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Guía Interactiva HPB</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -10,104 +10,522 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* Estilos personalizados */
-        html, body { height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #f0f4f8; }
-        .app-container { display: flex; flex-direction: column; height: 100vh; max-width: 640px; margin: 0 auto; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
-        main { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 110px; /* Espacio para footer y nav */ }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        html,
+        body {
+            height: 100%;
+            overflow-x: hidden;  /* Previene el scroll horizontal */
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+            display: flex; /* Para centrar el contenido principal */
+            flex-direction: column;
+        }
+
+        body {
+            padding-bottom: 60px; /* Espacio para la navegación inferior fija */
+            box-sizing: border-box;
+            position: relative; /* Para posicionar el footer absolutamente */
+        }
+
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Asegura que ocupe al menos el 100% del viewport */
+            max-width: 640px; /* Ancho máximo para el contenido principal */
+            margin: 0 auto; /* Centra horizontalmente en pantallas grandes */
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        main {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            padding-bottom: 70px; /* Ajuste para evitar superposición con la navegación */
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
 
         /* Footer y Nav Fijos */
-        .app-footer { position: absolute; bottom: 0; left: 0; right: 0; max-width: 640px; margin: 0 auto; background-color: white; border-top: 1px solid #e5e7eb; text-align: center; padding: 0.5rem 0; z-index: 10; }
-        .bottom-nav { position: absolute; bottom: 30px; left: 0; right: 0; max-width: 640px; margin: 0 auto; background-color: #ffffff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 5px rgb(0 0 0 / 0.1); padding-top: 0.25rem; padding-bottom: 0.25rem; z-index: 10; }
+        .app-footer {
+            position: fixed; /* Cambiado a fixed */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: white;
+            border-top: 1px solid #e5e7eb;
+            text-align: center;
+            padding: 0.5rem 0;
+            z-index: 10;
+        }
+
+        .bottom-nav {
+            position: fixed; /* Fix bottom nav to bottom */
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 640px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-top: 1px solid #e5e7eb;
+            box-shadow: 0 -2px 5px rgb(0 0 0 / 0.1);
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            z-index: 10;
+            display: flex; /* Use flexbox for navigation items */
+            justify-content: space-around; /* Space items evenly */
+        }
 
         /* Navegación */
-        .nav-button { padding-top: 0.5rem; padding-bottom: 0.25rem; border-top-width: 4px; transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease; border-radius: 0.375rem; margin: 0 0.25rem; }
-        .nav-button span { font-size: 0.7rem; }
-        .nav-button svg { margin-bottom: 0.1rem; }
-        .nav-button.active { color: #2563eb; border-top-color: #2563eb; background-color: #eff6ff; }
-        .nav-button.disabled-nav { color: #9ca3af; cursor: not-allowed; opacity: 0.6; pointer-events: none; }
+        .nav-button {
+            padding-top: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-top-width: 4px;
+            transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+            border-radius: 0.375rem;
+            margin: 0 0.25rem;
+            display: flex; /* Stack icon and text vertically */
+            flex-direction: column;
+            align-items: center;
+            flex: 1; /* Distribute space evenly between buttons */
+            text-align: center;
+        }
+
+        .nav-button span {
+            font-size: 0.7rem;
+            margin-top: 0.1rem; /* Add space between icon and text */
+        }
+
+        .nav-button svg {
+            margin-bottom: 0.1rem;
+        }
+
+        .nav-button.active {
+            color: #2563eb;
+            border-top-color: #2563eb;
+            background-color: #eff6ff;
+        }
+
+        .nav-button.disabled-nav {
+            color: #9ca3af;
+            cursor: not-allowed;
+            opacity: 0.6;
+            pointer-events: none;
+        }
 
         /* Checkbox */
-        .styled-checkbox:checked + label div.check-indicator { background-color: #2563eb; border-color: #2563eb; }
-        .styled-checkbox:checked + label svg { display: block; }
-        .check-indicator { width: 1.25rem; height: 1.25rem; border-width: 2px; border-color: #9ca3af; border-radius: 0.25rem; margin-right: 0.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease, border-color 0.2s ease; }
-        .check-indicator svg { width: 1rem; height: 1rem; color: white; display: none; }
-        .confirm-label { display: flex; align-items: center; padding: 0.75rem; background-color: white; border-radius: 0.5rem; border: 1px solid #d1d5db; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
-        .confirm-label:hover { border-color: #93c5fd; }
-        #confirm-checkbox:checked + .confirm-label { border-color: #16a34a; box-shadow: 0 0 0 2px #86efac; }
-        #confirm-checkbox:checked + .confirm-label .check-indicator { background-color: #16a34a; border-color: #16a34a; }
+        .styled-checkbox:checked + label div.check-indicator {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
+
+        .styled-checkbox:checked + label svg {
+            display: block;
+        }
+
+        .check-indicator {
+            width: 1.25rem;
+            height: 1.25rem;
+            border-width: 2px;
+            border-color: #9ca3af;
+            border-radius: 0.25rem;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+
+        .check-indicator svg {
+            width: 1rem;
+            height: 1rem;
+            color: white;
+            display: none;
+        }
+
+        .confirm-label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+        }
+
+        .confirm-label:hover {
+            border-color: #93c5fd;
+        }
+
+        #confirm-checkbox:checked + .confirm-label {
+            border-color: #16a34a;
+            box-shadow: 0 0 0 2px #86efac;
+        }
+
+        #confirm-checkbox:checked + .confirm-label .check-indicator {
+            background-color: #16a34a;
+            border-color: #16a34a;
+        }
 
         /* Tabla */
-        .comparison-table th, .comparison-table td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; vertical-align: top; }
-        .comparison-table th { background-color: #e5e7eb; font-weight: 600; }
+        .comparison-table th,
+        .comparison-table td {
+            border: 1px solid #e5e7eb;
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        .comparison-table th {
+            background-color: #e5e7eb;
+            font-weight: 600;
+        }
 
         /* Generales */
-        h1, h2, h3 { color: #1e3a8a; }
-        h1 { font-size: 1.75rem; font-weight: 700; }
-        h2 { font-size: 1.35rem; font-weight: 600; border-bottom: 2px solid #93c5fd; padding-bottom: 0.5rem; margin-bottom: 1rem; }
-        h3 { font-size: 1.15rem; font-weight: 600; }
+        h1,
+        h2,
+        h3 {
+            color: #1e3a8a;
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            border-bottom: 2px solid #93c5fd;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
 
         /* Tarjetas */
-        .info-card { background-color: #ffffff; border-radius: 0.75rem; border: 1px solid #d1d5db; padding: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); transition: transform 0.2s ease-in-out; }
-        .info-card:hover { transform: translateY(-2px); }
-        .info-card h3 { color: #1d4ed8; margin-bottom: 0.75rem; }
-        .info-card p, .info-card ul { color: #4b5563; line-height: 1.6; }
-        .info-card strong { color: #374151; font-weight: 600; }
+        .info-card {
+            background-color: #ffffff;
+            border-radius: 0.75rem;
+            border: 1px solid #d1d5db;
+            padding: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .info-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .info-card h3 {
+            color: #1d4ed8;
+            margin-bottom: 0.75rem;
+        }
+
+        .info-card p,
+        .info-card ul {
+            color: #4b5563;
+            line-height: 1.6;
+        }
+
+        .info-card strong {
+            color: #374151;
+            font-weight: 600;
+        }
 
         /* Botón */
-        .main-button { background-image: linear-gradient(to right, #3b82f6, #2563eb); color: white; font-weight: 600; padding: 0.75rem 1rem; border-radius: 0.5rem; transition: all 0.2s ease-in-out; box-shadow: 0 2px 4px rgb(0 0 0 / 0.2); }
-        .main-button:hover { opacity: 0.9; box-shadow: 0 4px 8px rgb(0 0 0 / 0.2); }
+        .main-button {
+            background-image: linear-gradient(to right, #3b82f6, #2563eb);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgb(0 0 0 / 0.2);
+            text-align: center;
+        }
+
+        .main-button:hover {
+            opacity: 0.9;
+            box-shadow: 0 4px 8px rgb(0 0 0 / 0.2);
+        }
 
         /* IPSS */
-        .ipss-question-card { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; }
-        .ipss-question-card label.question-text { color: #1f2937; font-weight: 500; margin-bottom: 0.75rem; }
-        .ipss-question-card .option-label { color: #374151; }
-        #ipss-result strong { font-weight: 600; }
-        #ipss-suggestion { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #9ca3af; }
+        .ipss-question-card {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .ipss-question-card label.question-text {
+            color: #1f2937;
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .ipss-question-card .option-label {
+            color: #374151;
+        }
+
+        #ipss-result strong {
+            font-weight: 600;
+        }
+
+        #ipss-suggestion {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px dashed #9ca3af;
+        }
 
         /* Warning */
-        .text-warning { color: #dc2626; font-weight: 600; }
-        .text-danger { color: #b91c1c; font-weight: 600; }
+        .text-warning {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .text-danger {
+            color: #b91c1c;
+            font-weight: 600;
+        }
 
         /* Checkbox Comparación */
-         .compare-label { display: flex; align-items: center; padding: 0.75rem; background-color: white; border-radius: 0.5rem; border: 1px solid #d1d5db; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
-         .compare-label:hover { border-color: #93c5fd; }
-         .compare-checkbox:checked + .compare-label { border-color: #2563eb; box-shadow: 0 0 0 2px #bfdbfe; }
-         .compare-checkbox:checked + .compare-label .check-indicator { background-color: #2563eb; border-color: #2563eb; }
+        .compare-label {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+        }
+
+        .compare-label:hover {
+            border-color: #93c5fd;
+        }
+
+        .compare-checkbox:checked + .compare-label {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 2px #bfdbfe;
+        }
+
+        .compare-checkbox:checked + .compare-label .check-indicator {
+            background-color: #2563eb;
+            border-color: #2563eb;
+        }
 
         /* Cajas Cirugía y Obstrucción */
-        .content-box { border-radius: 0.75rem; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 4px rgb(0 0 0 / 0.1); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; display: flex; flex-direction: column; justify-content: center; min-height: 80px; }
-        .content-box.clickable { cursor: pointer; }
-        .content-box.clickable:hover { transform: translateY(-3px); box-shadow: 0 6px 10px rgb(0 0 0 / 0.1); }
-        .content-box h3 { color: #1e3a8a; font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
-        .content-box p, .content-box ul { text-align: left; font-size: 0.9rem; color: #4b5563; margin-top: 0.75rem;}
-        .content-box ul { list-style: disc; padding-left: 1.5rem; }
-        .content-box .text-danger { font-weight: 600; }
+        .content-box {
+            border-radius: 0.75rem;
+            padding: 1.5rem 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 80px;
+        }
+
+        .content-box.clickable {
+            cursor: pointer;
+        }
+
+        .content-box.clickable:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 10px rgb(0 0 0 / 0.1);
+        }
+
+        .content-box h3 {
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .content-box p,
+        .content-box ul {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #4b5563;
+            margin-top: 0.75rem;
+        }
+
+        .content-box ul {
+            list-style: disc;
+            padding-left: 1.5rem;
+        }
+
+        .content-box .text-danger {
+            font-weight: 600;
+        }
 
         /* Colores tenues */
-        .color-1 { background-color: #e0f2fe; } .color-2 { background-color: #dcfce7; } .color-3 { background-color: #fef9c3; } .color-4 { background-color: #f3e8ff; } .color-5 { background-color: #ffe4e6; } .color-6 { background-color: #ede9fe; } .color-7 { background-color: #dbeafe; } .color-8 { background-color: #fee2e2; } .color-9 { background-color: #f0fdf4; } .color-10 { background-color: #ffedd5; }
+        .color-1 {
+            background-color: #e0f2fe;
+        }
+
+        .color-2 {
+            background-color: #dcfce7;
+        }
+
+        .color-3 {
+            background-color: #fef9c3;
+        }
+
+        .color-4 {
+            background-color: #f3e8ff;
+        }
+
+        .color-5 {
+            background-color: #ffe4e6;
+        }
+
+        .color-6 {
+            background-color: #ede9fe;
+        }
+
+        .color-7 {
+            background-color: #dbeafe;
+        }
+
+        .color-8 {
+            background-color: #fee2e2;
+        }
+
+        .color-9 {
+            background-color: #f0fdf4;
+        }
+
+        .color-10 {
+            background-color: #ffedd5;
+        }
 
         /* Sección Obstrucción - Diagramas */
-        .diagram-container { display: flex; flex-direction: column; align-items: center; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 1rem; background-color: #f8fafc; margin-bottom: 1rem; }
-        .bladder { width: 80px; height: 60px; background-color: #fef9c3; border: 2px solid #facc15; border-radius: 50% 50% 10px 10px; position: relative; margin-bottom: -5px; z-index: 1; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
-        .bladder.thickened { border-width: 4px; background-color: #fef08a; }
-        .bladder-urine { background-color: #bfdbfe; width: 100%; }
-        .prostate { width: 50px; height: 30px; background-color: #fed7aa; border: 2px solid #fb923c; border-radius: 15px; position: relative; margin-top: -10px; z-index: 2; }
-        .prostate.enlarged { width: 70px; height: 40px; background-color: #ffedd5; }
-        .urethra { width: 8px; height: 40px; background-color: #fecaca; border: 1px solid #ef4444; margin: -5px auto 0 auto; z-index: 1; position: relative; }
-        .urethra.obstructed { height: 30px; background-color: #fee2e2; border: none; border-left: 3px solid #ffedd5; border-right: 3px solid #ffedd5; width: 2px; }
-        .diagram-label { margin-top: 0.5rem; font-weight: 600; color: #1e3a8a; }
-        .explanation-text { margin-top: 0.75rem; text-align: center; color: #4b5563; font-size: 0.9rem; line-height: 1.5; }
-        .bladder.residual .bladder-urine { height: 30%; }
-        .bladder.normal .bladder-urine { height: 5%; }
+        .diagram-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            background-color: #f8fafc;
+            margin-bottom: 1rem;
+        }
+
+        .bladder {
+            width: 80px;
+            height: 60px;
+            background-color: #fef9c3;
+            border: 2px solid #facc15;
+            border-radius: 50% 50% 10px 10px;
+            position: relative;
+            margin-bottom: -5px;
+            z-index: 1;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .bladder.thickened {
+            border-width: 4px;
+            background-color: #fef08a;
+        }
+
+        .bladder-urine {
+            background-color: #bfdbfe;
+            width: 100%;
+        }
+
+        .prostate {
+            width: 50px;
+            height: 30px;
+            background-color: #fed7aa;
+            border: 2px solid #fb923c;
+            border-radius: 15px;
+            position: relative;
+            margin-top: -10px;
+            z-index: 2;
+        }
+
+        .prostate.enlarged {
+            width: 70px;
+            height: 40px;
+            background-color: #ffedd5;
+        }
+
+        .urethra {
+            width: 8px;
+            height: 40px;
+            background-color: #fecaca;
+            border: 1px solid #ef4444;
+            margin: -5px auto 0 auto;
+            z-index: 1;
+            position: relative;
+        }
+
+        .urethra.obstructed {
+            height: 30px;
+            background-color: #fee2e2;
+            border: none;
+            border-left: 3px solid #ffedd5;
+            border-right: 3px solid #ffedd5;
+            width: 2px;
+        }
+
+        .diagram-label {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .explanation-text {
+            margin-top: 0.75rem;
+            text-align: center;
+            color: #4b5563;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .bladder.residual .bladder-urine {
+            height: 30%;
+        }
+
+        .bladder.normal .bladder-urine {
+            height: 5%;
+        }
 
     </style>
 </head>
 <body class="bg-gray-100">
-
     <div class="app-container">
         <main id="main-content" class="no-scrollbar">
-
             <section id="inicio" class="space-y-6">
                 <h1 class="text-2xl font-bold text-blue-800 text-center mb-6">Guía Interactiva HPB</h1>
                 <div class="info-card bg-blue-50 border-blue-200">
@@ -118,22 +536,22 @@
                     <p class="text-gray-700">La Hiperplasia Benigna de Próstata (HPB), también conocida como agrandamiento de la próstata, es una condición común en hombres a medida que envejecen...</p>
                     <p class="text-gray-700 mt-3"><strong class="text-warning">Fundamental:</strong> El diagnóstico debe ser realizado por un profesional médico (urólogo)... <strong class="text-warning">no reemplaza la consulta médica</strong>.</p>
                 </div>
-                 <div class="info-card bg-green-50 border-green-200">
-                     <h3 class="text-lg font-semibold text-green-700 mb-3 flex items-center">
-                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                         ¿Cómo usar esta guía?
-                     </h3>
-                     <p class="text-gray-700">Utiliza la barra de navegación inferior para explorar las secciones.</p>
-                     <ul class="list-disc list-inside text-gray-700 ml-4 mt-2 space-y-1.5">
-                         <li>Realizar el test <strong>IPSS</strong> para evaluar tus síntomas y edad.</li>
-                         <li>Ver qué pasa con la <strong>Próstata y su Agrandamiento</strong>.</li>
-                         <li>Conocer las diferentes <strong>Cirugías</strong> disponibles.</li>
-                         <li><strong>Comparar</strong> visualmente hasta dos técnicas quirúrgicas.</li>
-                     </ul>
-                 </div>
+                <div class="info-card bg-green-50 border-green-200">
+                    <h3 class="text-lg font-semibold text-green-700 mb-3 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                        ¿Cómo usar esta guía?
+                    </h3>
+                    <p class="text-gray-700">Utiliza la barra de navegación inferior para explorar las secciones.</p>
+                    <ul class="list-disc list-inside text-gray-700 ml-4 mt-2 space-y-1.5">
+                        <li>Realizar el test <strong>IPSS</strong> para evaluar tus síntomas y edad.</li>
+                        <li>Ver qué pasa con la <strong>Próstata y su Agrandamiento</strong>.</li>
+                        <li>Conocer las diferentes <strong>Cirugías</strong> disponibles.</li>
+                        <li><strong>Comparar</strong> visualmente hasta dos técnicas quirúrgicas.</li>
+                    </ul>
+                </div>
 
-                 <div class="mt-6 pt-6 border-t text-center text-sm text-gray-600 space-y-2">
-                     <p class="font-semibold">Creado por Dr. Juan Carlos Riera M.</p>
+                <div class="mt-6 pt-6 border-t text-center text-sm text-gray-600 space-y-2">
+                    <p class="font-semibold">Creado por Dr. Juan Carlos Riera M.</p>
                      <p>
                          Información de consulta:
                          <a href="https://bit.ly/m/drjuancarlosrieram?fbclid=PAZXh0bgNhZW0CMTEAAae-Gn_jyw2ie8p-sssov0tNNxssQ1dHBrx4JJL3pbjhQkkHicoXYuziuv0wBA_aem_fB6TlNxLeFko-EDvwzYOHg" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline">
@@ -209,7 +627,7 @@
                          </div>
                          <p class="explanation-text mt-2 text-xs">Representación simplificada...</p>
                     </div>
-                    <div class="content-box color-8"> <h3>¿Qué pasa si no me trato? (Complicaciones)</h3>
+                     <div class="content-box color-8"> <h3>¿Qué pasa si no me trato? (Complicaciones)</h3>
                          <p>Ignorar los síntomas severos... puede llevar a problemas serios...</p>
                          <ul class="list-disc list-inside text-left ml-4 mt-2 space-y-1">
                              <li><strong class="text-danger">Retención Urinaria Aguda:</strong>...</li><li><strong class="text-danger">Infecciones Urinarias Recurrentes:</strong>...</li><li><strong class="text-danger">Cálculos (Piedras) en la Vejiga:</strong>...</li><li><strong class="text-danger">Sangrado Urinario (Hematuria):</strong>...</li><li><strong class="text-danger">Daño Vesical:</strong>...</li><li><strong class="text-danger">Daño Renal (Insuficiencia Renal):</strong>... ¡Esta es la complicación más grave!</li>
@@ -254,7 +672,7 @@
                 <button data-section="inicio" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 active"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span class="text-xs mt-1">Inicio</span></button>
                 <button data-section="ipss" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs mt-1">IPSS</span></button>
                  <button data-section="obstruccion" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0zM9 9.75h.008v.008H9V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm4.125 4.5h.008v.008h-.008V14.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg><span class="text-xs mt-1">Próstata</span> </button>
-                <button data-section="cirugias" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 4.293a1 1 0 011.414 1.414l-9 9a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586l8.293-8.293z"/><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-6a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0V4.75A.75.75 0 0110 4zM9.25 14a.75.75 0 01.75-.75h0a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h0a.75.75 0 01-.75-.75V14z" clip-rule="evenodd" /></svg><span class="text-xs mt-1">Cirugías</span></button>
+                <button data-section="cirugias" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 4.293a1 1 0 011.414 1.414l-9 9a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586l8.293-8.293a1 1 0 011.414 0z"/><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-6a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0V4.75A.75.75 0 0110 4zM9.25 14a.75.75 0 01.75-.75h0a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h0a.75.75 0 01-.75-.75V14z" clip-rule="evenodd" /></svg><span class="text-xs mt-1">Cirugías</span></button>
                 <button data-section="comparar" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3-1m0 0l3.001 9A5.002 5.002 0 0015 16m0 0l3-9m-3 9l-6-9m6 9l3-9M6 7l6-2m6 2l-6-2m6 2l3-1m-3 1l-3 9m12-9l-3 9a5.002 5.002 0 01-6.001 0M18 7l-3 1m0 0l-6 9m6-9l-3 1M18 7l-6-2m0 0l-6 2" /></svg><span class="text-xs mt-1">Comparar</span></button>
             </div>
         </nav>
@@ -284,7 +702,11 @@
             navButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     const targetSectionId = button.getAttribute('data-section');
-                    if (targetSectionId !== 'inicio' && !confirmCheckbox.checked) { confirmMessage.classList.remove('hidden'); confirmCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+                    if (targetSectionId !== 'inicio' && !confirmCheckbox.checked) {
+                        confirmMessage.classList.remove('hidden');
+                        confirmCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        return;
+                    }
                     confirmMessage.classList.add('hidden');
                     sections.forEach(section => section.classList.add('hidden'));
                     const targetSection = document.getElementById(targetSectionId);
@@ -309,38 +731,143 @@
             const suggestionTextSpan = document.getElementById('ipss-suggestion-text');
 
             function generateIpssQuestions() {
-                questionsContainer.innerHTML = ''; qolContainer.innerHTML = '';
-                ipssQuestions.forEach((q, index) => { const questionDiv = document.createElement('div'); questionDiv.classList.add('ipss-question-card'); const questionLabel = document.createElement('label'); questionLabel.classList.add('block', 'text-md', 'font-medium', 'mb-3', 'question-text'); questionLabel.textContent = `${index + 1}. ${q.text}`; questionDiv.appendChild(questionLabel); const optionsContainer = document.createElement('div'); optionsContainer.classList.add('space-y-3'); const currentOptions = (q.id === 'q7') ? nicturiaOptions : ipssOptions; currentOptions.forEach(opt => { const optionDiv = document.createElement('div'); optionDiv.classList.add('flex', 'items-center'); const input = document.createElement('input'); input.type = 'radio'; input.id = `${q.id}_${opt.value}`; input.name = q.id; input.value = opt.value; input.required = true; input.classList.add('h-4', 'w-4', 'text-blue-600', 'border-gray-300', 'focus:ring-blue-500', 'focus:ring-2'); const label = document.createElement('label'); label.htmlFor = `${q.id}_${opt.value}`; label.textContent = opt.text; label.classList.add('ml-3', 'block', 'text-sm', 'option-label'); optionDiv.appendChild(input); optionDiv.appendChild(label); optionsContainer.appendChild(optionDiv); }); questionDiv.appendChild(optionsContainer); questionsContainer.appendChild(questionDiv); });
-                const qolDiv = document.createElement('div'); qolDiv.classList.add('ipss-question-card'); const qolLabel = document.createElement('label'); qolLabel.classList.add('block', 'text-md', 'font-medium', 'mb-3', 'question-text'); qolLabel.textContent = qualityOfLifeQuestion.text; qolDiv.appendChild(qolLabel); const qolOptionsContainer = document.createElement('div'); qolOptionsContainer.classList.add('space-y-3'); qualityOfLifeOptions.forEach(opt => { const optionDiv = document.createElement('div'); optionDiv.classList.add('flex', 'items-center'); const input = document.createElement('input'); input.type = 'radio'; input.id = `${qualityOfLifeQuestion.id}_${opt.value}`; input.name = qualityOfLifeQuestion.id; input.value = opt.value; input.required = true; input.classList.add('h-4', 'w-4', 'text-blue-600', 'border-gray-300', 'focus:ring-blue-500', 'focus:ring-2'); const label = document.createElement('label'); label.htmlFor = `${qualityOfLifeQuestion.id}_${opt.value}`; label.textContent = `${opt.value} - ${opt.text}`; label.classList.add('ml-3', 'block', 'text-sm', 'option-label'); optionDiv.appendChild(input); optionDiv.appendChild(label); qolOptionsContainer.appendChild(optionDiv); }); qolDiv.appendChild(qolOptionsContainer); qolContainer.appendChild(qolDiv);
+                questionsContainer.innerHTML = '';
+                qolContainer.innerHTML = '';
+                ipssQuestions.forEach((q, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.classList.add('ipss-question-card');
+                    const questionLabel = document.createElement('label');
+                    questionLabel.classList.add('block', 'text-md', 'font-medium', 'mb-3', 'question-text');
+                    questionLabel.textContent = `${index + 1}. ${q.text}`;
+                    questionDiv.appendChild(questionLabel);
+                    const optionsContainer = document.createElement('div');
+                    optionsContainer.classList.add('space-y-3');
+                    const currentOptions = (q.id === 'q7') ? nicturiaOptions : ipssOptions;
+                    currentOptions.forEach(opt => {
+                        const optionDiv = document.createElement('div');
+                        optionDiv.classList.add('flex', 'items-center');
+                        const input = document.createElement('input');
+                        input.type = 'radio';
+                        input.id = `${q.id}_${opt.value}`;
+                        input.name = q.id;
+                        input.value = opt.value;
+                        input.required = true;
+                        input.classList.add('h-4', 'w-4', 'text-blue-600', 'border-gray-300', 'focus:ring-blue-500', 'focus:ring-2');
+                        const label = document.createElement('label');
+                        label.htmlFor = `${q.id}_${opt.value}`;
+                        label.textContent = opt.text;
+                        label.classList.add('ml-3', 'block', 'text-sm', 'option-label');
+                        optionDiv.appendChild(input);
+                        optionDiv.appendChild(label);
+                        optionsContainer.appendChild(optionDiv);
+                    });
+                    questionDiv.appendChild(optionsContainer);
+                    questionsContainer.appendChild(questionDiv);
+                });
+                const qolDiv = document.createElement('div');
+                qolDiv.classList.add('ipss-question-card');
+                const qolLabel = document.createElement('label');
+                qolLabel.classList.add('block', 'text-md', 'font-medium', 'mb-3', 'question-text');
+                qolLabel.textContent = qualityOfLifeQuestion.text;
+                qolDiv.appendChild(qolLabel);
+                const qolOptionsContainer = document.createElement('div');
+                qolOptionsContainer.classList.add('space-y-3');
+                qualityOfLifeOptions.forEach(opt => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.classList.add('flex', 'items-center');
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.id = `${qualityOfLifeQuestion.id}_${opt.value}`;
+                    input.name = qualityOfLifeQuestion.id;
+                    input.value = opt.value;
+                    input.required = true;
+                    input.classList.add('h-4', 'w-4', 'text-blue-600', 'border-gray-300', 'focus:ring-blue-500', 'focus:ring-2');
+                    const label = document.createElement('label');
+                    label.htmlFor = `${qualityOfLifeQuestion.id}_${opt.value}`;
+                    label.textContent = `${opt.value} - ${opt.text}`;
+                    label.classList.add('ml-3', 'block', 'text-sm', 'option-label');
+                    optionDiv.appendChild(input);
+                    optionDiv.appendChild(label);
+                    qolOptionsContainer.appendChild(optionDiv);
+                });
+                qolDiv.appendChild(qolOptionsContainer);
+                qolContainer.appendChild(qolDiv);
             }
             generateIpssQuestions();
 
             ipssForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                let totalScore = 0; let qolScore = 0; let qolText = '';
+                let totalScore = 0;
+                let qolScore = 0;
+                let qolText = '';
                 const ageSelect = document.getElementById('age-range');
                 const selectedAge = ageSelect.options[ageSelect.selectedIndex].text;
 
-                ipssQuestions.forEach(q => { const selected = ipssForm.querySelector(`input[name="${q.id}"]:checked`); if(selected) totalScore += parseInt(selected.value); });
-                const selectedQol = ipssForm.querySelector(`input[name="${qualityOfLifeQuestion.id}"]:checked`); if(selectedQol) { qolScore = parseInt(selectedQol.value); qolText = qualityOfLifeOptions.find(o => o.value === qolScore)?.text || ''; }
+                ipssQuestions.forEach(q => {
+                    const selected = ipssForm.querySelector(`input[name="${q.id}"]:checked`);
+                    if (selected) totalScore += parseInt(selected.value);
+                });
+                const selectedQol = ipssForm.querySelector(`input[name="${qualityOfLifeQuestion.id}"]:checked`);
+                if (selectedQol) {
+                    qolScore = parseInt(selectedQol.value);
+                    qolText = qualityOfLifeOptions.find(o => o.value === qolScore)?.text || '';
+                }
 
                 let classification = '';
                 let severityExplanation = '';
                 let suggestion = '';
 
-                if (totalScore <= 7) { classification = 'Leves'; severityExplanation = 'Sus síntomas actuales se consideran leves.'; suggestion = 'Generalmente no requieren tratamiento inmediato, pero es bueno vigilarlos. Si los síntomas le molestan o empeoran, considere una consulta urológica. La edad también puede influir en la decisión.';
-                } else if (totalScore <= 19) { classification = 'Moderados'; severityExplanation = 'Sus síntomas actuales se consideran moderados.'; suggestion = 'Se recomienda una consulta con el urólogo para evaluar su caso y discutir las opciones de tratamiento (medicamentos o cirugía), especialmente si afectan su calidad de vida.';
-                } else { classification = 'Severos'; severityExplanation = 'Sus síntomas actuales se consideran severos.'; suggestion = 'Es importante consultar al urólogo pronto. Los síntomas severos suelen requerir tratamiento (medicamentos o cirugía) para mejorar su calidad de vida y prevenir complicaciones.';
+                if (totalScore <= 7) {
+                    classification = 'Leves';severityExplanation = 'Sus síntomas actuales se consideran leves.';
+                    suggestion = 'Generalmente no requieren tratamiento inmediato, pero es bueno vigilarlos. Si los síntomas le molestan o empeoran, considere una consulta urológica. La edad también puede influir en la decisión.';
+                } else if (totalScore <= 19) {
+                    classification = 'Moderados';
+                    severityExplanation = 'Sus síntomas actuales se consideran moderados.';
+                    suggestion = 'Se recomienda una consulta con el urólogo para evaluar su caso y discutir las opciones de tratamiento (medicamentos o cirugía), especialmente si afectan su calidad de vida.';
+                } else {
+                    classification = 'Severos';
+                    severityExplanation = 'Sus síntomas actuales se consideran severos.';
+                    suggestion = 'Es importante consultar al urólogo pronto. Los síntomas severos suelen requerir tratamiento (medicamentos o cirugía) para mejorar su calidad de vida y prevenir complicaciones.';
                 }
-                ageSpan.textContent = selectedAge; scoreSpan.textContent = totalScore; classificationSpan.textContent = classification; severityExplanationSpan.textContent = severityExplanation; qolScoreSpan.textContent = qolScore; qolTextSpan.textContent = qolText; suggestionTextSpan.textContent = suggestion;
-                resultContainer.classList.remove('hidden'); resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                ageSpan.textContent = selectedAge;
+                scoreSpan.textContent = totalScore;
+                classificationSpan.textContent = classification;
+                severityExplanationSpan.textContent = severityExplanation;
+                qolScoreSpan.textContent = qolScore;
+                qolTextSpan.textContent = qolText;
+                suggestionTextSpan.textContent = suggestion;
+                resultContainer.classList.remove('hidden');
+                resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
             });
 
             // --- Lógica Cirugías ---
             const surgeryContainer = document.getElementById('surgery-cards-container');
             const detailsContainer = document.getElementById('surgery-details-container');
-            function generateSurgeryBoxes() { surgeryContainer.innerHTML = ''; detailsContainer.innerHTML = ''; detailsContainer.classList.add('hidden'); surgeryData.forEach((surgery, index) => { const box = document.createElement('div'); const colorClass = surgeryColors[index % surgeryColors.length]; box.classList.add('content-box', 'clickable', colorClass); box.setAttribute('data-surgery-id', surgery.id); box.innerHTML = `<h3>${surgery.name}</h3>`; box.addEventListener('click', () => { showSurgeryDetails(surgery.id); document.querySelectorAll('#surgery-cards-container .content-box').forEach(b => b.style.border = 'none'); box.style.border = '2px solid #1e3a8a'; }); surgeryContainer.appendChild(box); }); }
-            function showSurgeryDetails(surgeryId) { const surgery = surgeryData.find(s => s.id === surgeryId); if (!surgery) return; detailsContainer.innerHTML = `<h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center">${surgery.icon || ''} ${surgery.name}</h3><div class="space-y-2.5 text-sm"><p><strong class="text-gray-600">Descripción:</strong> ${surgery.description}</p><p><strong class="text-gray-600">Indicaciones:</strong> ${surgery.indications}</p><p><strong class="text-gray-600">Efectividad:</strong> ${surgery.effectiveness}</p><p><strong class="text-gray-600">IMPORTANTE SABER:</strong> ${surgery.risks}</p></div>`; detailsContainer.classList.remove('hidden'); detailsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+            function generateSurgeryBoxes() {
+                surgeryContainer.innerHTML = '';
+                detailsContainer.innerHTML = '';
+                detailsContainer.classList.add('hidden');
+                surgeryData.forEach((surgery, index) => {
+                    const box = document.createElement('div');
+                    const colorClass = surgeryColors[index % surgeryColors.length];
+                    box.classList.add('content-box', 'clickable', colorClass);
+                    box.setAttribute('data-surgery-id', surgery.id);
+                    box.innerHTML = `<h3>${surgery.name}</h3>`;
+                    box.addEventListener('click', () => {
+                        showSurgeryDetails(surgery.id);
+                        document.querySelectorAll('#surgery-cards-container .content-box').forEach(b => b.style.border = 'none');
+                        box.style.border = '2px solid #1e3a8a';
+                    });
+                    surgeryContainer.appendChild(box);
+                });
+            }
+            function showSurgeryDetails(surgeryId) {
+                const surgery = surgeryData.find(s => s.id === surgeryId);
+                if (!surgery) return;
+                detailsContainer.innerHTML = `<h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center">${surgery.icon || ''} ${surgery.name}</h3><div class="space-y-2.5 text-sm"><p><strong class="text-gray-600">Descripción:</strong> ${surgery.description}</p><p><strong class="text-gray-600">Indicaciones:</strong> ${surgery.indications}</p><p><strong class="text-gray-600">Efectividad:</strong> ${surgery.effectiveness}</p><p><strong class="text-gray-600">IMPORTANTE SABER:</strong> ${surgery.risks}</p></div>`;
+                detailsContainer.classList.remove('hidden');
+                detailsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
             generateSurgeryBoxes();
 
              // --- Lógica Comparación ---
@@ -353,11 +880,87 @@
             const compareCol2Header = document.getElementById('compare-col-2-header');
             let selectedTechniques = [];
             const comparisonFeatures = [ { key: 'invasiveness', label: 'Invasividad' }, { key: 'hospitalStay', label: 'Estancia Hospitalaria' }, { key: 'catheter', label: 'Sonda Vesical' }, { key: 'bleedingRisk', label: 'Riesgo Sangrado' }, { key: 'ejaculationRetrograde', label: 'Eyaculación Retrógrada' }, { key: 'anesthesia', label: 'Anestesia' } ];
-            function generateCompareCheckboxes() { compareSelectionDiv.innerHTML = ''; surgeryData.forEach(surgery => { const wrapper = document.createElement('div'); const input = document.createElement('input'); input.type = 'checkbox'; input.id = `compare_${surgery.id}`; input.value = surgery.id; input.classList.add('compare-checkbox', 'styled-checkbox', 'hidden'); input.addEventListener('change', handleCompareSelection); const label = document.createElement('label'); label.htmlFor = `compare_${surgery.id}`; label.classList.add('compare-label'); const checkIndicator = document.createElement('div'); checkIndicator.classList.add('check-indicator'); const checkIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); checkIcon.setAttribute('viewBox', '0 0 20 20'); checkIcon.setAttribute('fill', 'currentColor'); checkIcon.innerHTML = `<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />`; checkIndicator.appendChild(checkIcon); const nameSpan = document.createElement('span'); nameSpan.textContent = surgery.name; nameSpan.classList.add('text-sm', 'font-medium', 'text-gray-800'); label.appendChild(checkIndicator); label.appendChild(nameSpan); wrapper.appendChild(input); wrapper.appendChild(label); compareSelectionDiv.appendChild(wrapper); }); }
+            function generateCompareCheckboxes() {
+                compareSelectionDiv.innerHTML = '';
+                surgeryData.forEach(surgery => {
+                    const wrapper = document.createElement('div');
+                    const input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.id = `compare_${surgery.id}`;
+                    input.value = surgery.id;
+                    input.classList.add('compare-checkbox', 'styled-checkbox', 'hidden');
+                    input.addEventListener('change', handleCompareSelection);
+                    const label = document.createElement('label');
+                    label.htmlFor = `compare_${surgery.id}`;
+                    label.classList.add('compare-label');
+                    const checkIndicator = document.createElement('div');
+                    checkIndicator.classList.add('check-indicator');
+                    const checkIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    checkIcon.setAttribute('viewBox', '0 0 20 20');
+                    checkIcon.setAttribute('fill', 'currentColor');
+                    checkIcon.innerHTML = `<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />`;
+                    checkIndicator.appendChild(checkIcon);
+                    const nameSpan = document.createElement('span');
+                    nameSpan.textContent = surgery.name;
+                    nameSpan.classList.add('text-sm', 'font-medium', 'text-gray-800');
+                    label.appendChild(checkIndicator);
+                    label.appendChild(nameSpan);
+                    wrapper.appendChild(input);
+                    wrapper.appendChild(label);
+                    compareSelectionDiv.appendChild(wrapper);
+                });
+            }
             generateCompareCheckboxes();
-            function handleCompareSelection(event) { const techniqueId = event.target.value; const isChecked = event.target.checked; if (isChecked) { if (selectedTechniques.length < 2) selectedTechniques.push(techniqueId); else { event.target.checked = false; showCompareLimitMessage(true); return; } } else { selectedTechniques = selectedTechniques.filter(id => id !== techniqueId); showCompareLimitMessage(false); } updateComparisonTable(); }
-            function showCompareLimitMessage(show) { compareLimitMsgDiv.classList.toggle('hidden', !show); if(show) setTimeout(() => compareLimitMsgDiv.classList.add('hidden'), 3000); }
-            function updateComparisonTable() { const showTable = selectedTechniques.length === 2; compareResultsDiv.classList.toggle('hidden', !showTable); comparePromptDiv.classList.toggle('hidden', showTable); compareTableBody.innerHTML = ''; compareCol1Header.textContent = 'Técnica 1'; compareCol2Header.textContent = 'Técnica 2'; if (showTable) { const tech1 = surgeryData.find(s => s.id === selectedTechniques[0]); const tech2 = surgeryData.find(s => s.id === selectedTechniques[1]); compareCol1Header.textContent = tech1.name; compareCol2Header.textContent = tech2.name; comparisonFeatures.forEach(feature => { const row = compareTableBody.insertRow(); const cellFeature = row.insertCell(); const cellTech1 = row.insertCell(); const cellTech2 = row.insertCell(); cellFeature.classList.add('px-6', 'py-3', 'font-semibold', 'text-gray-700', 'whitespace-nowrap', 'bg-gray-100'); cellTech1.classList.add('px-6', 'py-3'); cellTech2.classList.add('px-6', 'py-3'); cellFeature.textContent = feature.label; cellTech1.textContent = tech1.comparisonPoints?.[feature.key] || 'N/A'; cellTech2.textContent = tech2.comparisonPoints?.[feature.key] || 'N/A'; }); compareResultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
+
+            function handleCompareSelection(event) {
+                const techniqueId = event.target.value;
+                const isChecked = event.target.checked;
+                if (isChecked) {
+                    if (selectedTechniques.length < 2) selectedTechniques.push(techniqueId);
+                    else {
+                        event.target.checked = false;
+                        showCompareLimitMessage(true);
+                        return;
+                    }
+                } else {
+                    selectedTechniques = selectedTechniques.filter(id => id !== techniqueId);
+                    showCompareLimitMessage(false);
+                }
+                updateComparisonTable();
+            }
+
+            function showCompareLimitMessage(show) {
+                compareLimitMsgDiv.classList.toggle('hidden', !show);
+                if (show) setTimeout(() => compareLimitMsgDiv.classList.add('hidden'), 3000);
+            }
+
+            function updateComparisonTable() {
+                const showTable = selectedTechniques.length === 2;
+                compareResultsDiv.classList.toggle('hidden', !showTable);
+                comparePromptDiv.classList.toggle('hidden', showTable);
+                compareTableBody.innerHTML = '';
+                compareCol1Header.textContent = 'Técnica 1';
+                compareCol2Header.textContent = 'Técnica 2';
+                if (showTable) {
+                    const tech1 = surgeryData.find(s => s.id === selectedTechniques[0]);
+                    const tech2 = surgeryData.find(s => s.id === selectedTechniques[1]);
+                    compareCol1Header.textContent = tech1.name;
+                    compareCol2Header.textContent = tech2.name;
+                    comparisonFeatures.forEach(feature => {
+                        const row = compareTableBody.insertRow();
+                        const cellFeature = row.insertCell();
+                        const cellTech1 = row.insertCell();
+                        const cellTech2 = row.insertCell();
+                        cellFeature.classList.add('px-6', 'py-3', 'font-semibold', 'text-gray-700', 'whitespace-nowrap', 'bg-gray-100');
+                        cellTech1.classList.add('px-6', 'py-3');
+                        cellTech2.classList.add('px-6', 'py-3');
+                        cellFeature.textContent = feature.label;
+                        cellTech1.textContent = tech1.comparisonPoints?.[feature.key] || 'N/A';
+                        cellTech2.textContent = tech2.comparisonPoints?.[feature.key] || 'N/A';
+                    });
+                    compareResultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
 
             // --- Inicialización ---
             updateNavButtonState();
@@ -366,4 +969,4 @@
     </script>
 
 </body>
-</ht
+</html>
