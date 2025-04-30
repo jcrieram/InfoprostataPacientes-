@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva HPB</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Estilos personalizados */
+        html, body { height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #f0f4f8; }
+        .app-container { display: flex; flex-direction: column; height: 100vh; max-width: 640px; margin: 0 auto; background-color: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); position: relative; }
+        main { flex-grow: 1; overflow-y: auto; padding: 1rem; padding-bottom: 110px; /* Espacio para footer y nav */ }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Footer y Nav Fijos */
+        .app-footer { position: absolute; bottom: 0; left: 0; right: 0; max-width: 640px; margin: 0 auto; background-color: white; border-top: 1px solid #e5e7eb; text-align: center; padding: 0.5rem 0; z-index: 10; }
+        .bottom-nav { position: absolute; bottom: 30px; left: 0; right: 0; max-width: 640px; margin: 0 auto; background-color: #ffffff; border-top: 1px solid #e5e7eb; box-shadow: 0 -2px 5px rgb(0 0 0 / 0.1); padding-top: 0.25rem; padding-bottom: 0.25rem; z-index: 10; }
+
+        /* Navegación */
+        .nav-button { padding-top: 0.5rem; padding-bottom: 0.25rem; border-top-width: 4px; transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease; border-radius: 0.375rem; margin: 0 0.25rem; }
+        .nav-button span { font-size: 0.7rem; }
+        .nav-button svg { margin-bottom: 0.1rem; }
+        .nav-button.active { color: #2563eb; border-top-color: #2563eb; background-color: #eff6ff; }
+        .nav-button.disabled-nav { color: #9ca3af; cursor: not-allowed; opacity: 0.6; pointer-events: none; }
+
+        /* Checkbox */
+        .styled-checkbox:checked + label div.check-indicator { background-color: #2563eb; border-color: #2563eb; }
+        .styled-checkbox:checked + label svg { display: block; }
+        .check-indicator { width: 1.25rem; height: 1.25rem; border-width: 2px; border-color: #9ca3af; border-radius: 0.25rem; margin-right: 0.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s ease, border-color 0.2s ease; }
+        .check-indicator svg { width: 1rem; height: 1rem; color: white; display: none; }
+        .confirm-label { display: flex; align-items: center; padding: 0.75rem; background-color: white; border-radius: 0.5rem; border: 1px solid #d1d5db; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
+        .confirm-label:hover { border-color: #93c5fd; }
+        #confirm-checkbox:checked + .confirm-label { border-color: #16a34a; box-shadow: 0 0 0 2px #86efac; }
+        #confirm-checkbox:checked + .confirm-label .check-indicator { background-color: #16a34a; border-color: #16a34a; }
+
+        /* Tabla */
+        .comparison-table th, .comparison-table td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; vertical-align: top; }
+        .comparison-table th { background-color: #e5e7eb; font-weight: 600; }
+
+        /* Generales */
+        h1, h2, h3 { color: #1e3a8a; }
+        h1 { font-size: 1.75rem; font-weight: 700; }
+        h2 { font-size: 1.35rem; font-weight: 600; border-bottom: 2px solid #93c5fd; padding-bottom: 0.5rem; margin-bottom: 1rem; }
+        h3 { font-size: 1.15rem; font-weight: 600; }
+
+        /* Tarjetas */
+        .info-card { background-color: #ffffff; border-radius: 0.75rem; border: 1px solid #d1d5db; padding: 1rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); transition: transform 0.2s ease-in-out; }
+        .info-card:hover { transform: translateY(-2px); }
+        .info-card h3 { color: #1d4ed8; margin-bottom: 0.75rem; }
+        .info-card p, .info-card ul { color: #4b5563; line-height: 1.6; }
+        .info-card strong { color: #374151; font-weight: 600; }
+
+        /* Botón */
+        .main-button { background-image: linear-gradient(to right, #3b82f6, #2563eb); color: white; font-weight: 600; padding: 0.75rem 1rem; border-radius: 0.5rem; transition: all 0.2s ease-in-out; box-shadow: 0 2px 4px rgb(0 0 0 / 0.2); }
+        .main-button:hover { opacity: 0.9; box-shadow: 0 4px 8px rgb(0 0 0 / 0.2); }
+
+        /* IPSS */
+        .ipss-question-card { background-color: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; }
+        .ipss-question-card label.question-text { color: #1f2937; font-weight: 500; margin-bottom: 0.75rem; }
+        .ipss-question-card .option-label { color: #374151; }
+        #ipss-result strong { font-weight: 600; }
+        #ipss-suggestion { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed #9ca3af; }
+
+        /* Warning */
+        .text-warning { color: #dc2626; font-weight: 600; }
+        .text-danger { color: #b91c1c; font-weight: 600; }
+
+        /* Checkbox Comparación */
+         .compare-label { display: flex; align-items: center; padding: 0.75rem; background-color: white; border-radius: 0.5rem; border: 1px solid #d1d5db; cursor: pointer; transition: border-color 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 1px 2px rgb(0 0 0 / 0.05); }
+         .compare-label:hover { border-color: #93c5fd; }
+         .compare-checkbox:checked + .compare-label { border-color: #2563eb; box-shadow: 0 0 0 2px #bfdbfe; }
+         .compare-checkbox:checked + .compare-label .check-indicator { background-color: #2563eb; border-color: #2563eb; }
+
+        /* Cajas Cirugía y Obstrucción */
+        .content-box { border-radius: 0.75rem; padding: 1.5rem 1rem; text-align: center; box-shadow: 0 2px 4px rgb(0 0 0 / 0.1); transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; display: flex; flex-direction: column; justify-content: center; min-height: 80px; }
+        .content-box.clickable { cursor: pointer; }
+        .content-box.clickable:hover { transform: translateY(-3px); box-shadow: 0 6px 10px rgb(0 0 0 / 0.1); }
+        .content-box h3 { color: #1e3a8a; font-weight: 600; font-size: 1rem; margin-bottom: 0.5rem; }
+        .content-box p, .content-box ul { text-align: left; font-size: 0.9rem; color: #4b5563; margin-top: 0.75rem;}
+        .content-box ul { list-style: disc; padding-left: 1.5rem; }
+        .content-box .text-danger { font-weight: 600; }
+
+        /* Colores tenues */
+        .color-1 { background-color: #e0f2fe; } .color-2 { background-color: #dcfce7; } .color-3 { background-color: #fef9c3; } .color-4 { background-color: #f3e8ff; } .color-5 { background-color: #ffe4e6; } .color-6 { background-color: #ede9fe; } .color-7 { background-color: #dbeafe; } .color-8 { background-color: #fee2e2; } .color-9 { background-color: #f0fdf4; } .color-10 { background-color: #ffedd5; }
+
+        /* Sección Obstrucción - Diagramas */
+        .diagram-container { display: flex; flex-direction: column; align-items: center; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 1rem; background-color: #f8fafc; margin-bottom: 1rem; }
+        .bladder { width: 80px; height: 60px; background-color: #fef9c3; border: 2px solid #facc15; border-radius: 50% 50% 10px 10px; position: relative; margin-bottom: -5px; z-index: 1; display: flex; align-items: flex-end; justify-content: center; overflow: hidden; }
+        .bladder.thickened { border-width: 4px; background-color: #fef08a; }
+        .bladder-urine { background-color: #bfdbfe; width: 100%; }
+        .prostate { width: 50px; height: 30px; background-color: #fed7aa; border: 2px solid #fb923c; border-radius: 15px; position: relative; margin-top: -10px; z-index: 2; }
+        .prostate.enlarged { width: 70px; height: 40px; background-color: #ffedd5; }
+        .urethra { width: 8px; height: 40px; background-color: #fecaca; border: 1px solid #ef4444; margin: -5px auto 0 auto; z-index: 1; position: relative; }
+        .urethra.obstructed { height: 30px; background-color: #fee2e2; border: none; border-left: 3px solid #ffedd5; border-right: 3px solid #ffedd5; width: 2px; }
+        .diagram-label { margin-top: 0.5rem; font-weight: 600; color: #1e3a8a; }
+        .explanation-text { margin-top: 0.75rem; text-align: center; color: #4b5563; font-size: 0.9rem; line-height: 1.5; }
+        .bladder.residual .bladder-urine { height: 30%; }
+        .bladder.normal .bladder-urine { height: 5%; }
+
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="app-container">
+        <main id="main-content" class="no-scrollbar">
+
+            <section id="inicio" class="space-y-6">
+                <h1 class="text-2xl font-bold text-blue-800 text-center mb-6">Guía Interactiva HPB</h1>
+                <div class="info-card bg-blue-50 border-blue-200">
+                    <h2 class="text-xl font-semibold text-blue-700 mb-3 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        ¿Qué es la Hiperplasia Benigna de Próstata (HPB)?
+                    </h2>
+                    <p class="text-gray-700">La Hiperplasia Benigna de Próstata (HPB), también conocida como agrandamiento de la próstata, es una condición común en hombres a medida que envejecen...</p>
+                    <p class="text-gray-700 mt-3"><strong class="text-warning">Fundamental:</strong> El diagnóstico debe ser realizado por un profesional médico (urólogo)... <strong class="text-warning">no reemplaza la consulta médica</strong>.</p>
+                </div>
+                 <div class="info-card bg-green-50 border-green-200">
+                     <h3 class="text-lg font-semibold text-green-700 mb-3 flex items-center">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                         ¿Cómo usar esta guía?
+                     </h3>
+                     <p class="text-gray-700">Utiliza la barra de navegación inferior para explorar las secciones.</p>
+                     <ul class="list-disc list-inside text-gray-700 ml-4 mt-2 space-y-1.5">
+                         <li>Realizar el test <strong>IPSS</strong> para evaluar tus síntomas y edad.</li>
+                         <li>Ver qué pasa con la <strong>Próstata y su Agrandamiento</strong>.</li>
+                         <li>Conocer las diferentes <strong>Cirugías</strong> disponibles.</li>
+                         <li><strong>Comparar</strong> visualmente hasta dos técnicas quirúrgicas.</li>
+                     </ul>
+                 </div>
+
+                 <div class="mt-6 pt-6 border-t text-center text-sm text-gray-600 space-y-2">
+                     <p class="font-semibold">Creado por Dr. Juan Carlos Riera M.</p>
+                     <p>
+                         Información de consulta:
+                         <a href="https://bit.ly/m/drjuancarlosrieram?fbclid=PAZXh0bgNhZW0CMTEAAae-Gn_jyw2ie8p-sssov0tNNxssQ1dHBrx4JJL3pbjhQkkHicoXYuziuv0wBA_aem_fB6TlNxLeFko-EDvwzYOHg" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline">
+                             Agendar Consulta / Más Información
+                         </a>
+                     </p>
+                     <p>
+                         <a href="https://www.instagram.com/drjuancarlosriera/" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 hover:underline">
+                             Perfil de Instagram
+                         </a>
+                     </p>
+                 </div>
+
+                 <div class="mt-6 border-t pt-6">
+                     <input type="checkbox" id="confirm-checkbox" class="styled-checkbox">
+                    <label for="confirm-checkbox" class="confirm-label">
+                        <div class="check-indicator">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                        </div>
+                        <span class="text-sm font-medium text-gray-700">Confirmo que he leído la información inicial y entiendo que esta guía no reemplaza la consulta médica.</span>
+                    </label>
+                    <p id="confirm-message" class="text-red-600 text-sm mt-2 text-center hidden">Debes confirmar la lectura para acceder a las otras secciones.</p>
+                 </div>
+            </section>
+
+            <section id="ipss" class="hidden space-y-4">
+                 <h2 class="text-xl font-bold text-blue-800 mb-4">Test IPSS y Edad</h2>
+                <p class="text-base text-gray-600 mb-6">Responde las siguientes preguntas pensando en cómo te has sentido durante el <strong class="font-semibold">último mes</strong> y selecciona tu rango de edad.</p>
+                <form id="ipss-form" class="space-y-6">
+                    <div class="ipss-question-card">
+                        <label for="age-range" class="block text-md font-medium mb-3 question-text">Selecciona tu rango de edad:</label>
+                        <select id="age-range" name="age_range" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                            <option value="">-- Selecciona --</option>
+                            <option value="<50">Menor de 50 años</option>
+                            <option value="50-59">50 - 59 años</option>
+                            <option value="60-69">60 - 69 años</option>
+                            <option value="70+">70 años o más</option>
+                        </select>
+                    </div>
+                    <div id="ipss-questions"></div>
+                    <div id="ipss-quality-of-life" class="mt-8 pt-6 border-t border-gray-300"></div>
+                    <button type="submit" class="w-full main-button">Calcular Puntuación y Ver Sugerencia</button>
+                </form>
+                <div id="ipss-result" class="hidden mt-8 info-card bg-blue-50 border-blue-200"> <h3 class="text-lg font-semibold text-blue-800 mb-3">Resultados del Test IPSS</h3>
+                    <p class="text-gray-700 text-base"><strong>Edad seleccionada:</strong> <span id="ipss-age" class="font-semibold"></span></p>
+                    <p class="text-gray-700 text-base"><strong>Puntuación Total (Síntomas):</strong> <span id="ipss-score" class="font-bold text-xl text-blue-900">0</span></p>
+                    <p class="text-gray-700 text-base"><strong>Clasificación de Síntomas:</strong> <span id="ipss-classification" class="font-bold text-lg"></span></p>
+                    <p class="text-gray-700 mt-2 text-base"><strong id="ipss-severity-explanation"></strong></p> <p class="text-gray-700 mt-3 text-base"><strong>Calidad de Vida (síntomas urinarios):</strong> <span id="ipss-qol-score" class="font-bold"></span> (<span id="ipss-qol-text" class="font-semibold"></span>)</p>
+                    <div id="ipss-suggestion" class="text-base"><strong class="text-indigo-700">Sugerencia:</strong> <span id="ipss-suggestion-text"></span></div>
+                    <p class="text-sm mt-5"><strong class="text-warning">Importante:</strong> Este resultado y sugerencia son orientativos... <strong class="text-warning">Consulta siempre a tu urólogo</strong>...</p>
+                </div>
+            </section>
+
+            <section id="obstruccion" class="hidden space-y-6">
+                 <h2 class="text-xl font-bold text-blue-800 mb-4">¿Qué pasa con mi próstata y su agrandamiento?</h2>
+                <div class="space-y-5">
+                    <div class="content-box color-1">
+                        <h3>Crecimiento y Obstrucción</h3>
+                        <p>La glándula prostática rodea la uretra... puede apretar la uretra...</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                             <div class="diagram-container"><div class="bladder normal"><div class="bladder-urine" style="height: 5%;"></div></div><div class="prostate"></div><div class="urethra"></div><div class="diagram-label">Normal</div></div>
+                             <div class="diagram-container"><div class="bladder thickened"><div class="bladder-urine" style="height: 5%;"></div></div><div class="prostate enlarged"></div><div class="urethra obstructed"></div><div class="diagram-label">Obstrucción</div></div>
+                        </div>
+                         <p class="explanation-text mt-2 text-xs">Representación simplificada...</p>
+                    </div>
+                    <div class="content-box color-2">
+                         <h3>Dinámica Urinaria Afectada</h3>
+                         <p>Al estar la uretra obstruida, la vejiga tiene que hacer más fuerza...</p>
+                         <ul class="list-disc list-inside text-left ml-4 mt-2"><li>Que la pared de la vejiga se engruese...</li><li>Que no se vacíe completamente...</li><li>Este residuo puede favorecer infecciones...</li></ul>
+                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                              <div class="diagram-container"><div class="bladder normal"><div class="bladder-urine" style="height: 5%;"></div></div><div class="prostate"></div><div class="urethra"></div><div class="diagram-label">Vaciado Normal</div></div>
+                              <div class="diagram-container"><div class="bladder thickened residual"><div class="bladder-urine" style="height: 30%;"></div></div><div class="prostate enlarged"></div><div class="urethra obstructed"></div><div class="diagram-label">Vaciado Incompleto</div></div>
+                         </div>
+                         <p class="explanation-text mt-2 text-xs">Representación simplificada...</p>
+                    </div>
+                    <div class="content-box color-8"> <h3>¿Qué pasa si no me trato? (Complicaciones)</h3>
+                         <p>Ignorar los síntomas severos... puede llevar a problemas serios...</p>
+                         <ul class="list-disc list-inside text-left ml-4 mt-2 space-y-1">
+                             <li><strong class="text-danger">Retención Urinaria Aguda:</strong>...</li><li><strong class="text-danger">Infecciones Urinarias Recurrentes:</strong>...</li><li><strong class="text-danger">Cálculos (Piedras) en la Vejiga:</strong>...</li><li><strong class="text-danger">Sangrado Urinario (Hematuria):</strong>...</li><li><strong class="text-danger">Daño Vesical:</strong>...</li><li><strong class="text-danger">Daño Renal (Insuficiencia Renal):</strong>... ¡Esta es la complicación más grave!</li>
+                         </ul>
+                         <p class="mt-3"><strong class="text-danger">No tratar la HPB sintomática o complicada puede llevar a un deterioro significativo...</strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="cirugias" class="hidden space-y-6">
+                <h2 class="text-xl font-bold text-blue-800 mb-4">Técnicas Quirúrgicas para la HPB</h2>
+                <p class="text-base text-gray-600 mb-6">Existen diversas opciones quirúrgicas...</p>
+                <div id="surgery-cards-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+                 <div id="surgery-details-container" class="mt-6 hidden info-card"></div>
+            </section>
+
+            <section id="comparar" class="hidden space-y-6">
+                <h2 class="text-xl font-bold text-blue-800 mb-4">Comparar Técnicas Quirúrgicas</h2>
+                <p class="text-base text-gray-600 mb-6">Selecciona <strong class="font-semibold">exactamente dos</strong> técnicas...</p>
+                <div id="compare-selection" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"></div>
+                <div id="compare-results" class="hidden space-y-4">
+                    <h3 class="text-lg font-semibold text-gray-800">Comparación</h3>
+                     <div class="overflow-x-auto shadow-md rounded-lg">
+                        <table class="w-full text-sm text-left text-gray-600 comparison-table">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-200"><tr><th scope="col" class="px-6 py-3">Característica</th><th id="compare-col-1-header" scope="col" class="px-6 py-3">Técnica 1</th><th id="compare-col-2-header" scope="col" class="px-6 py-3">Técnica 2</th></tr></thead>
+                            <tbody id="compare-table-body" class="bg-white"></tbody>
+                        </table>
+                    </div>
+                </div>
+                 <div id="compare-prompt" class="text-center text-gray-500 mt-8 text-base">Por favor, selecciona dos técnicas...</div>
+                 <div id="compare-limit-msg" class="hidden text-center text-red-600 mt-4 font-semibold text-base">Solo puedes seleccionar un máximo de dos...</div>
+            </section>
+
+        </main>
+
+        <footer class="app-footer">
+            <p class="text-xs text-gray-500">By Juan Carlos Riera M</p>
+        </footer>
+
+        <nav class="bottom-nav">
+            <div class="flex justify-around">
+                <button data-section="inicio" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 active"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span class="text-xs mt-1">Inicio</span></button>
+                <button data-section="ipss" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="text-xs mt-1">IPSS</span></button>
+                 <button data-section="obstruccion" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0zM9 9.75h.008v.008H9V9.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm4.125 4.5h.008v.008h-.008V14.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg><span class="text-xs mt-1">Próstata</span> </button>
+                <button data-section="cirugias" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.293 4.293a1 1 0 011.414 1.414l-9 9a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586l8.293-8.293z"/><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-6a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0V4.75A.75.75 0 0110 4zM9.25 14a.75.75 0 01.75-.75h0a.75.75 0 01.75.75v.01a.75.75 0 01-.75.75h0a.75.75 0 01-.75-.75V14z" clip-rule="evenodd" /></svg><span class="text-xs mt-1">Cirugías</span></button>
+                <button data-section="comparar" class="nav-button flex-1 flex flex-col items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50"><svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3-1m0 0l3.001 9A5.002 5.002 0 0015 16m0 0l3-9m-3 9l-6-9m6 9l3-9M6 7l6-2m6 2l-6-2m6 2l3-1m-3 1l-3 9m12-9l-3 9a5.002 5.002 0 01-6.001 0M18 7l-3 1m0 0l-6 9m6-9l-3 1M18 7l-6-2m0 0l-6 2" /></svg><span class="text-xs mt-1">Comparar</span></button>
+            </div>
+        </nav>
+    </div>
+
+    <script>
+        // --- Datos (sin cambios) ---
+        const ipssQuestions = [ { id: 'q1', text: 'Sensación de vaciado incompleto: Durante el último mes, ¿con qué frecuencia ha tenido la sensación de no vaciar completamente la vejiga al terminar de orinar?' }, { id: 'q2', text: 'Frecuencia miccional diurna: Durante el último mes, ¿con qué frecuencia ha tenido que volver a orinar en menos de dos horas después de haber orinado?' }, { id: 'q3', text: 'Intermitencia: Durante el último mes, ¿con qué frecuencia ha observado que el chorro de orina se para y comienza de nuevo varias veces mientras orinaba?' }, { id: 'q4', text: 'Urgencia miccional: Durante el último mes, ¿con qué frecuencia ha tenido dificultad para aguantar las ganas de orinar?' }, { id: 'q5', text: 'Chorro débil: Durante el último mes, ¿con qué frecuencia ha observado que el chorro de la orina es débil?' }, { id: 'q6', text: 'Esfuerzo miccional: Durante el último mes, ¿con qué frecuencia ha tenido que hacer fuerza o apretar para comenzar a orinar?' }, { id: 'q7', text: 'Nicturia: Durante el último mes, ¿cuántas veces ha tenido que levantarse por la noche para orinar, desde que se acostó hasta que se levantó por la mañana?' } ];
+        const ipssOptions = [ { value: 0, text: 'Ninguna vez' }, { value: 1, text: 'Menos de 1 vez de cada 5' }, { value: 2, text: 'Menos de la mitad de las veces' }, { value: 3, text: 'Aproximadamente la mitad de las veces' }, { value: 4, text: 'Más de la mitad de las veces' }, { value: 5, text: 'Casi siempre' } ];
+        const nicturiaOptions = [ { value: 0, text: 'Ninguna' }, { value: 1, text: '1 vez' }, { value: 2, text: '2 veces' }, { value: 3, text: '3 veces' }, { value: 4, text: '4 veces' }, { value: 5, text: '5 veces o más' } ];
+        const qualityOfLifeQuestion = { id: 'qol', text: 'Calidad de vida: Si tuviera que pasar el resto de su vida con los síntomas urinarios tal como los siente ahora, ¿cómo se sentiría?' };
+        const qualityOfLifeOptions = [ { value: 0, text: 'Encantado' }, { value: 1, text: 'Satisfecho' }, { value: 2, text: 'Bastante satisfecho' }, { value: 3, text: 'Indiferente (ni satisfecho ni insatisfecho)' }, { value: 4, text: 'Bastante insatisfecho' }, { value: 5, text: 'Infeliz' }, { value: 6, text: 'Terrible' } ];
+        const surgeryData = [ { id: 'rtup', name: 'Resección Transuretral de Próstata (RTUP)', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>`, description: 'Considerada el "estándar de oro". Se introduce un instrumento por la uretra para cortar y extraer tejido prostático obstructivo. Puede ser monopolar o bipolar.', indications: 'Próstatas < 80 gramos. Síntomas moderados a severos.', effectiveness: 'Muy efectiva para aliviar síntomas y mejorar flujo. Superior a tratamiento farmacológico para síntomas moderados/severos.', risks: 'Sangrado, infección, estenosis uretral. Eyaculación retrógrada (común). Requiere anestesia general/espinal. Mayor riesgo de complicaciones y estancia hospitalaria que técnicas más nuevas (HoLEP, bipolar). Posible necesidad de reintervención.', comparisonPoints: { invasiveness: 'Moderada (endoscópica)', hospitalStay: '1-3 días', catheter: 'Sí (días)', bleedingRisk: 'Moderado', ejaculationRetrograde: 'Alto', anesthesia: 'General/Espinal' } }, { id: 'open', name: 'Prostatectomía Simple Abierta', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>`, description: 'Cirugía abierta tradicional. Se realiza una incisión para extraer el adenoma prostático.', indications: 'Próstatas muy grandes (> 80-100 gramos). Cuando no hay disponibilidad de RTUP bipolar o HoLEP.', effectiveness: 'Muy efectiva y duradera, especialmente para próstatas grandes. Eficacia similar a RTUP bipolar y HoLEP a corto/medio plazo.', risks: 'La más invasiva. Mayor riesgo de sangrado, complicaciones hemodinámicas/respiratorias, tromboembolismo. Mayor estancia hospitalaria y tasa de complicaciones que RTUP bipolar y HoLEP. Requiere anestesia general/espinal. Eyaculación retrógrada.', comparisonPoints: { invasiveness: 'Alta (abierta)', hospitalStay: 'Varios días', catheter: 'Sí (más tiempo)', bleedingRisk: 'Alto', ejaculationRetrograde: 'Muy Alto', anesthesia: 'General/Espinal' } }, { id: 'lap_robot', name: 'Prostatectomía Simple Laparoscópica/Robótica', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>`, description: 'Extracción del adenoma mediante pequeñas incisiones usando laparoscopia o asistencia robótica.', indications: 'Alternativa a la cirugía abierta para próstatas grandes.', effectiveness: 'Efectiva, resultados a largo plazo similares a la abierta. Cura a largo plazo.', risks: 'Menos pérdida de sangre, menor riesgo de transfusión, menor estancia hospitalaria y menos complicaciones que la cirugía abierta. Tiempo quirúrgico más largo. Requiere anestesia general. Eyaculación retrógrada.', comparisonPoints: { invasiveness: 'Moderada (mínimamente invasiva)', hospitalStay: 'Menor que abierta', catheter: 'Sí (variable)', bleedingRisk: 'Bajo-Moderado', ejaculationRetrograde: 'Alto', anesthesia: 'General' } }, { id: 'holep', name: 'Enucleación Prostática con Láser Holmium (HoLEP)', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`, description: 'Utiliza láser Holmium para cortar y extraer el tejido prostático (adenoma) en bloque, que luego se fragmenta y extrae.', indications: 'Adecuada para próstatas de cualquier tamaño, incluyendo muy grandes. Alternativa a RTUP y cirugía abierta.', effectiveness: 'Muy efectiva. Eficacia similar a RTUP y abierta para próstatas grandes. Resultados duraderos.', risks: 'Requiere anestesia general/espinal. Necesita hospitalización y sonda. Posibles complicaciones (sangrado, infección, incontinencia urinaria). Puede causar eyaculación retrógrada. Mejor perfil de seguridad perioperatoria que la cirugía abierta (menos sangrado, estancia más corta). Curva de aprendizaje para el cirujano.', comparisonPoints: { invasiveness: 'Moderada (endoscópica)', hospitalStay: '1-2 días', catheter: 'Sí (corto)', bleedingRisk: 'Bajo', ejaculationRetrograde: 'Alto', anesthesia: 'General/Espinal' } }, { id: 'greenlight', name: 'Vaporización Fotoselectiva con Láser (VFP / GreenLight)', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>`, description: 'Utiliza energía láser (luz verde) para vaporizar (eliminar) el tejido prostático obstructivo.', indications: 'Próstatas de tamaño pequeño a moderado (< 80-100g). Buena opción para pacientes con anticoagulantes.', effectiveness: 'Efectiva a corto y largo plazo. Mejora síntomas, flujo y calidad de vida.', risks: 'Menor riesgo de complicaciones (sangrado) que RTUP. Estancia hospitalaria corta o ambulatoria. Puede requerir sonda por corto tiempo. Menor riesgo de eyaculación retrógrada que RTUP/HoLEP, pero aún posible. Puede causar síntomas irritativos temporales post-cirugía.', comparisonPoints: { invasiveness: 'Baja-Moderada (endoscópica)', hospitalStay: 'Ambulatorio o 1 día', catheter: 'Sí (corto o ninguno)', bleedingRisk: 'Muy Bajo', ejaculationRetrograde: 'Bajo-Moderado', anesthesia: 'General/Espinal/Sedación' } }, { id: 'rezum', name: 'Terapia Térmica con Vapor de Agua (Rezūm)', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.657 7.343A8 8 0 0117.657 18.657z" /><path stroke-linecap="round" stroke-linejoin="round" d="M9.343 17.657A8 8 0 0118.657 8.343S18 10 16 11c0-2-.5-5-2.986-7C11 6 8.91 6.777 7.343 8.343a8 8 0 012 9.314z" /></svg>`, description: 'Inyecta vapor de agua en la próstata para destruir el tejido obstructivo.', indications: 'Próstatas de tamaño pequeño a moderado (30-80g). Pacientes que desean preservar la función eyaculatoria. Alternativa mínimamente invasiva.', effectiveness: 'Mejora síntomas y flujo. Efectividad a largo plazo aún en estudio comparado con técnicas más establecidas.', risks: 'Mínimamente invasiva. Se realiza con anestesia local/sedación. Ambulatorio. No suele requerir sonda o por muy poco tiempo. Preserva la función eyaculatoria en la mayoría de los casos. Puede causar síntomas urinarios temporales (inflamación). Riesgo bajo de complicaciones.', comparisonPoints: { invasiveness: 'Muy Baja (endoscópica)', hospitalStay: 'Ambulatorio', catheter: 'Opcional/Muy corto', bleedingRisk: 'Muy Bajo', ejaculationRetrograde: 'Muy Bajo', anesthesia: 'Local/Sedación' } }, { id: 'urolift', name: 'Levantamiento Uretral Prostático (UroLift)', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>`, description: 'Implantes pequeños que levantan y apartan el tejido prostático, abriendo la uretra.', indications: 'Próstatas de tamaño pequeño a moderado (< 80g). Pacientes que desean preservar la función eyaculatoria. No adecuado si hay lóbulo medio grande.', effectiveness: 'Mejora síntomas y flujo rápidamente.', risks: 'Mínimamente invasiva. Se realiza con anestesia local/sedación. Ambulatorio. No requiere sonda habitualmente. Preserva la función eyaculatoria. Bajo riesgo de complicaciones. Puede causar molestias urinarias leves y temporales.', comparisonPoints: { invasiveness: 'Muy Baja (endoscópica)', hospitalStay: 'Ambulatorio', catheter: 'Raramente', bleedingRisk: 'Muy Bajo', ejaculationRetrograde: 'Muy Bajo', anesthesia: 'Local/Sedación' } }, { id: 'itup', name: 'Incisión Transuretral de la Próstata (ITUP)', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879a1 1 0 01-1.414 0L9 14m7 0l2.879-2.879a1 1 0 000-1.414L16 7M9 14l-7 7" /></svg>`, description: 'Realiza uno o dos cortes pequeños en el cuello de la vejiga y la próstata para ensanchar la uretra, sin extraer tejido.', indications: 'Próstatas pequeñas (< 30g) que causan obstrucción significativa.', effectiveness: 'Menos efectiva que la RTUP para próstatas más grandes, pero útil en casos seleccionados.', risks: 'Menos invasiva que la RTUP. Hospitalización corta (1-3 días). Menor riesgo de eyaculación retrógrada que RTUP. Requiere anestesia general/espinal.', comparisonPoints: { invasiveness: 'Baja (endoscópica)', hospitalStay: '1-3 días', catheter: 'Sí (corto)', bleedingRisk: 'Bajo', ejaculationRetrograde: 'Bajo', anesthesia: 'General/Espinal' } }, { id: 'eap', name: 'Embolización de Arterias Prostáticas (EAP)', icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>`, description: 'Procedimiento radiológico intervencionista. Se bloquean las arterias que irrigan la próstata para reducir su tamaño.', indications: 'Pacientes no candidatos a cirugía o que la rechazan. Próstatas de diversos tamaños. Alternativa mínimamente invasiva.', effectiveness: 'Mejora síntomas y reduce el tamaño prostático. Efectividad a largo plazo en estudio.', risks: 'Mínimamente invasiva (cateterismo arterial). Realizado por radiólogo intervencionista. Anestesia local. Generalmente ambulatorio o corta estancia. Bajo riesgo de complicaciones sexuales (eyaculación). Posibles efectos secundarios relacionados con la embolización (dolor pélvico temporal, síndrome post-embolización). Requiere experiencia específica.', comparisonPoints: { invasiveness: 'Muy Baja (radiología intervencionista)', hospitalStay: 'Ambulatorio o 1 día', catheter: 'Opcional/Corto', bleedingRisk: 'Muy Bajo', ejaculationRetrograde: 'Muy Bajo', anesthesia: 'Local' } } ];
+        const surgeryColors = ['color-1', 'color-2', 'color-3', 'color-4', 'color-5', 'color-6', 'color-7', 'color-8', 'color-9', 'color-10'];
+
+        // --- Lógica de la Aplicación ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = document.querySelectorAll('main > section');
+            const navButtons = document.querySelectorAll('.nav-button');
+            const mainContent = document.getElementById('main-content');
+            const confirmCheckbox = document.getElementById('confirm-checkbox');
+            const confirmMessage = document.getElementById('confirm-message');
+
+            function updateNavButtonState() { const isConfirmed = confirmCheckbox.checked; navButtons.forEach(button => { const section = button.getAttribute('data-section'); if (section !== 'inicio') button.classList.toggle('disabled-nav', !isConfirmed); }); }
+            confirmCheckbox.addEventListener('change', () => { updateNavButtonState(); confirmMessage.classList.toggle('hidden', confirmCheckbox.checked); });
+
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetSectionId = button.getAttribute('data-section');
+                    if (targetSectionId !== 'inicio' && !confirmCheckbox.checked) { confirmMessage.classList.remove('hidden'); confirmCheckbox.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
+                    confirmMessage.classList.add('hidden');
+                    sections.forEach(section => section.classList.add('hidden'));
+                    const targetSection = document.getElementById(targetSectionId);
+                    if (targetSection) targetSection.classList.remove('hidden');
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    mainContent.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+
+            // --- Lógica IPSS ---
+            const ipssForm = document.getElementById('ipss-form');
+            const questionsContainer = document.getElementById('ipss-questions');
+            const qolContainer = document.getElementById('ipss-quality-of-life');
+            const resultContainer = document.getElementById('ipss-result');
+            const ageSpan = document.getElementById('ipss-age');
+            const scoreSpan = document.getElementById('ipss-score');
+            const classificationSpan = document.getElementById('ipss-classification');
+            const severityExplanationSpan = document.getElementById('ipss-severity-explanation');
+            const qolScoreSpan = document.getElementById('ipss-qol-score');
+            const qolTextSpan = document.getElementById('ipss-qol-text');
+            const suggestionTextSpan = document.getElementById('ipss-suggestion-text');
+
+            function generateIpssQuestions() {
+                questionsContainer.innerHTML = ''; qolContainer.innerHTML = '';
+                ipssQuestions.forEach((q, index) => { const questionDiv = document.createElement('div'); questionDiv.classList.add('ipss-question-card'); const questionLabel = document.createElement('label'); questionLabel.classList.add('block', 'text-md', 'font-medium', 'mb-3', 'question-text'); questionLabel.textContent = `${index + 1}. ${q.text}`; questionDiv.appendChild(questionLabel); const optionsContainer = document.createElement('div'); optionsContainer.classList.add('space-y-3'); const currentOptions = (q.id === 'q7') ? nicturiaOptions : ipssOptions; currentOptions.forEach(opt => { const optionDiv = document.createElement('div'); optionDiv.classList.add('flex', 'items-center'); const input = document.createElement('input'); input.type = 'radio'; input.id = `${q.id}_${opt.value}`; input.name = q.id; input.value = opt.value; input.required = true; input.classList.add('h-4', 'w-4', 'text-blue-600', 'border-gray-300', 'focus:ring-blue-500', 'focus:ring-2'); const label = document.createElement('label'); label.htmlFor = `${q.id}_${opt.value}`; label.textContent = opt.text; label.classList.add('ml-3', 'block', 'text-sm', 'option-label'); optionDiv.appendChild(input); optionDiv.appendChild(label); optionsContainer.appendChild(optionDiv); }); questionDiv.appendChild(optionsContainer); questionsContainer.appendChild(questionDiv); });
+                const qolDiv = document.createElement('div'); qolDiv.classList.add('ipss-question-card'); const qolLabel = document.createElement('label'); qolLabel.classList.add('block', 'text-md', 'font-medium', 'mb-3', 'question-text'); qolLabel.textContent = qualityOfLifeQuestion.text; qolDiv.appendChild(qolLabel); const qolOptionsContainer = document.createElement('div'); qolOptionsContainer.classList.add('space-y-3'); qualityOfLifeOptions.forEach(opt => { const optionDiv = document.createElement('div'); optionDiv.classList.add('flex', 'items-center'); const input = document.createElement('input'); input.type = 'radio'; input.id = `${qualityOfLifeQuestion.id}_${opt.value}`; input.name = qualityOfLifeQuestion.id; input.value = opt.value; input.required = true; input.classList.add('h-4', 'w-4', 'text-blue-600', 'border-gray-300', 'focus:ring-blue-500', 'focus:ring-2'); const label = document.createElement('label'); label.htmlFor = `${qualityOfLifeQuestion.id}_${opt.value}`; label.textContent = `${opt.value} - ${opt.text}`; label.classList.add('ml-3', 'block', 'text-sm', 'option-label'); optionDiv.appendChild(input); optionDiv.appendChild(label); qolOptionsContainer.appendChild(optionDiv); }); qolDiv.appendChild(qolOptionsContainer); qolContainer.appendChild(qolDiv);
+            }
+            generateIpssQuestions();
+
+            ipssForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                let totalScore = 0; let qolScore = 0; let qolText = '';
+                const ageSelect = document.getElementById('age-range');
+                const selectedAge = ageSelect.options[ageSelect.selectedIndex].text;
+
+                ipssQuestions.forEach(q => { const selected = ipssForm.querySelector(`input[name="${q.id}"]:checked`); if(selected) totalScore += parseInt(selected.value); });
+                const selectedQol = ipssForm.querySelector(`input[name="${qualityOfLifeQuestion.id}"]:checked`); if(selectedQol) { qolScore = parseInt(selectedQol.value); qolText = qualityOfLifeOptions.find(o => o.value === qolScore)?.text || ''; }
+
+                let classification = '';
+                let severityExplanation = '';
+                let suggestion = '';
+
+                if (totalScore <= 7) { classification = 'Leves'; severityExplanation = 'Sus síntomas actuales se consideran leves.'; suggestion = 'Generalmente no requieren tratamiento inmediato, pero es bueno vigilarlos. Si los síntomas le molestan o empeoran, considere una consulta urológica. La edad también puede influir en la decisión.';
+                } else if (totalScore <= 19) { classification = 'Moderados'; severityExplanation = 'Sus síntomas actuales se consideran moderados.'; suggestion = 'Se recomienda una consulta con el urólogo para evaluar su caso y discutir las opciones de tratamiento (medicamentos o cirugía), especialmente si afectan su calidad de vida.';
+                } else { classification = 'Severos'; severityExplanation = 'Sus síntomas actuales se consideran severos.'; suggestion = 'Es importante consultar al urólogo pronto. Los síntomas severos suelen requerir tratamiento (medicamentos o cirugía) para mejorar su calidad de vida y prevenir complicaciones.';
+                }
+                ageSpan.textContent = selectedAge; scoreSpan.textContent = totalScore; classificationSpan.textContent = classification; severityExplanationSpan.textContent = severityExplanation; qolScoreSpan.textContent = qolScore; qolTextSpan.textContent = qolText; suggestionTextSpan.textContent = suggestion;
+                resultContainer.classList.remove('hidden'); resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            // --- Lógica Cirugías ---
+            const surgeryContainer = document.getElementById('surgery-cards-container');
+            const detailsContainer = document.getElementById('surgery-details-container');
+            function generateSurgeryBoxes() { surgeryContainer.innerHTML = ''; detailsContainer.innerHTML = ''; detailsContainer.classList.add('hidden'); surgeryData.forEach((surgery, index) => { const box = document.createElement('div'); const colorClass = surgeryColors[index % surgeryColors.length]; box.classList.add('content-box', 'clickable', colorClass); box.setAttribute('data-surgery-id', surgery.id); box.innerHTML = `<h3>${surgery.name}</h3>`; box.addEventListener('click', () => { showSurgeryDetails(surgery.id); document.querySelectorAll('#surgery-cards-container .content-box').forEach(b => b.style.border = 'none'); box.style.border = '2px solid #1e3a8a'; }); surgeryContainer.appendChild(box); }); }
+            function showSurgeryDetails(surgeryId) { const surgery = surgeryData.find(s => s.id === surgeryId); if (!surgery) return; detailsContainer.innerHTML = `<h3 class="text-lg font-semibold text-blue-700 mb-3 flex items-center">${surgery.icon || ''} ${surgery.name}</h3><div class="space-y-2.5 text-sm"><p><strong class="text-gray-600">Descripción:</strong> ${surgery.description}</p><p><strong class="text-gray-600">Indicaciones:</strong> ${surgery.indications}</p><p><strong class="text-gray-600">Efectividad:</strong> ${surgery.effectiveness}</p><p><strong class="text-gray-600">IMPORTANTE SABER:</strong> ${surgery.risks}</p></div>`; detailsContainer.classList.remove('hidden'); detailsContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+            generateSurgeryBoxes();
+
+             // --- Lógica Comparación ---
+            const compareSelectionDiv = document.getElementById('compare-selection');
+            const compareResultsDiv = document.getElementById('compare-results');
+            const comparePromptDiv = document.getElementById('compare-prompt');
+            const compareLimitMsgDiv = document.getElementById('compare-limit-msg');
+            const compareTableBody = document.getElementById('compare-table-body');
+            const compareCol1Header = document.getElementById('compare-col-1-header');
+            const compareCol2Header = document.getElementById('compare-col-2-header');
+            let selectedTechniques = [];
+            const comparisonFeatures = [ { key: 'invasiveness', label: 'Invasividad' }, { key: 'hospitalStay', label: 'Estancia Hospitalaria' }, { key: 'catheter', label: 'Sonda Vesical' }, { key: 'bleedingRisk', label: 'Riesgo Sangrado' }, { key: 'ejaculationRetrograde', label: 'Eyaculación Retrógrada' }, { key: 'anesthesia', label: 'Anestesia' } ];
+            function generateCompareCheckboxes() { compareSelectionDiv.innerHTML = ''; surgeryData.forEach(surgery => { const wrapper = document.createElement('div'); const input = document.createElement('input'); input.type = 'checkbox'; input.id = `compare_${surgery.id}`; input.value = surgery.id; input.classList.add('compare-checkbox', 'styled-checkbox', 'hidden'); input.addEventListener('change', handleCompareSelection); const label = document.createElement('label'); label.htmlFor = `compare_${surgery.id}`; label.classList.add('compare-label'); const checkIndicator = document.createElement('div'); checkIndicator.classList.add('check-indicator'); const checkIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); checkIcon.setAttribute('viewBox', '0 0 20 20'); checkIcon.setAttribute('fill', 'currentColor'); checkIcon.innerHTML = `<path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />`; checkIndicator.appendChild(checkIcon); const nameSpan = document.createElement('span'); nameSpan.textContent = surgery.name; nameSpan.classList.add('text-sm', 'font-medium', 'text-gray-800'); label.appendChild(checkIndicator); label.appendChild(nameSpan); wrapper.appendChild(input); wrapper.appendChild(label); compareSelectionDiv.appendChild(wrapper); }); }
+            generateCompareCheckboxes();
+            function handleCompareSelection(event) { const techniqueId = event.target.value; const isChecked = event.target.checked; if (isChecked) { if (selectedTechniques.length < 2) selectedTechniques.push(techniqueId); else { event.target.checked = false; showCompareLimitMessage(true); return; } } else { selectedTechniques = selectedTechniques.filter(id => id !== techniqueId); showCompareLimitMessage(false); } updateComparisonTable(); }
+            function showCompareLimitMessage(show) { compareLimitMsgDiv.classList.toggle('hidden', !show); if(show) setTimeout(() => compareLimitMsgDiv.classList.add('hidden'), 3000); }
+            function updateComparisonTable() { const showTable = selectedTechniques.length === 2; compareResultsDiv.classList.toggle('hidden', !showTable); comparePromptDiv.classList.toggle('hidden', showTable); compareTableBody.innerHTML = ''; compareCol1Header.textContent = 'Técnica 1'; compareCol2Header.textContent = 'Técnica 2'; if (showTable) { const tech1 = surgeryData.find(s => s.id === selectedTechniques[0]); const tech2 = surgeryData.find(s => s.id === selectedTechniques[1]); compareCol1Header.textContent = tech1.name; compareCol2Header.textContent = tech2.name; comparisonFeatures.forEach(feature => { const row = compareTableBody.insertRow(); const cellFeature = row.insertCell(); const cellTech1 = row.insertCell(); const cellTech2 = row.insertCell(); cellFeature.classList.add('px-6', 'py-3', 'font-semibold', 'text-gray-700', 'whitespace-nowrap', 'bg-gray-100'); cellTech1.classList.add('px-6', 'py-3'); cellTech2.classList.add('px-6', 'py-3'); cellFeature.textContent = feature.label; cellTech1.textContent = tech1.comparisonPoints?.[feature.key] || 'N/A'; cellTech2.textContent = tech2.comparisonPoints?.[feature.key] || 'N/A'; }); compareResultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' }); } }
+
+            // --- Inicialización ---
+            updateNavButtonState();
+            document.querySelector('.nav-button[data-section="inicio"]').click();
+        });
+    </script>
+
+</body>
+</ht
